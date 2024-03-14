@@ -18,3 +18,7 @@ const bigNumber = 100000000
 
 console.log(Math);
 console.log(Math.floor(4.3));
+const min = 10
+const max = 20
+const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min
+console.log(randomNumber);
