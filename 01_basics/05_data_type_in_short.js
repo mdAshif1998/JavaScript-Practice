@@ -34,3 +34,20 @@ const myFunction = function(){
 }
 // myFunction is object function in data type
 console.log(typeof myFunction);
+
+// Memory: Stack (Primitive) We get copy, Heap (Non-Primitive) We get referance
+
+let myName = "Hello"
+let otherName = myName
+otherName = "World"
+
+let userOne = {
+
+    email: "user@google.com",
+    upi: "user@ybl"
+}
+
+let userTwo = userOne
+userTwo.email = "usertwo@google.com"
+console.log(userOne.email);
+console.log(userTwo.email);
