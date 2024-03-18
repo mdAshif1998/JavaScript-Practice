@@ -26,5 +26,6 @@ jsUser.greeting = function(){
 jsUser.greetingTwo = function(){
     console.log(`Hello Js User ${this.name}`);
 }
+Object.freeze(jsUser) // Freeze the object and not allowed to change anything inside it.
 console.log(jsUser.greeting());
 console.log(jsUser.greetingTwo());
