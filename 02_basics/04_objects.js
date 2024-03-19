@@ -47,3 +47,15 @@ console.log(Object.values(user));
 console.log(Object.entries(user));
 
 console.log(user.hasOwnProperty('cool'));
+
+const course = {
+    courseInstructorName: "Hello World",
+    price: "Free",
+    duration: 60
+}
+const {courseInstructorName: instructor} = course
+console.log(instructor);
+const navbar = ({company}) => {
+
+}
+navbar(company = "Hello")
