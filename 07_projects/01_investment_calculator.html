@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="01_investment_calculator.css">
+    <title>My Investment Calculator</title>
+</head>
+<body>
+    <div class="top-bar">
+        <h1>Let's enter your details to calculate the profit</h1>
+    </div>
+    <div class="card-container">
+        <div class="card">
+            <form class="form-service-decades">
+                <label2 for="decadeField" id="decadeInfo">Total Number of Decades</label>
+                <input type="text" id="decadeField" class="decadeField">
+                <input type="submit" id="subt" value="Submit" class="decadeInfoSubmit">
+            </form>
+        </div>
+
+        <div class="card">
+            <form class="form-decade-wise-increment">
+                <label2 for="incrementField" id="fillIncrement">
+                    Enter decade-wise increment (Percentage)
+                </label>
+            </form>
+        </div>
+
+        <div class="card">
+            <form class="form-other-details">
+
+            </form>
+        </div>
+        
+        <div class="card" id="validation">
+            <p>Result: <span class="validation-result"></span></p>
+        </div>
+
+        <div class="card" id="profit">
+            <p>Final Profit: <span class="profit"></span></p>
+        </div>
+    </div>
+</body>
+<script src="01_investment_calculator.js"></script>
+</html>

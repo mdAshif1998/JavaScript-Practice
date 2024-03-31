@@ -1,0 +1,117 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+body{
+    background-color: #FAD961;
+    background-image: linear-gradient(90deg, #FAD961 0%, #F76B1C 100%);
+
+}
+.top-bar{
+    align-items: center;
+    align-content: center;
+    text-align: center;
+    padding: 15px;
+    color: black;
+    
+}
+
+/* CSS for the card container */
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px; /* Optional: to limit the maximum width */
+  }
+
+  /* CSS for the card */
+  .card {
+    flex: 1 1 300px; /* Flex property to make cards dynamic in size */
+    min-width: 300px; /* Minimum width for each card */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    background-color: #F4D03F;
+    background-image: linear-gradient(132deg, #F4D03F 0%, #16A085 100%);
+
+  }
+
+  .card h2 {
+    margin-top: 0;
+  }
+
+  .card p {
+    margin-bottom: 0;
+  }
+
+  /* Media query for responsiveness */
+  @media screen and (max-width: 768px) {
+    .card {
+      flex-basis: calc(50% - 20px); /* Two cards per row on smaller screens */
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .card {
+      flex-basis: 100%; /* One card per row on smaller screens */
+    }
+  }
+
+  #subt {
+    background-color: #161616;
+    color: #ffffff;
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 20px;
+    border-style: none;
+    margin-top: 50px;
+    
+  }
+
+  #decadeField {
+    color: #000;
+    width: 250px;
+    height: 40px;
+    font-size: 30px;
+    border-style: none;
+    margin-top: 25px;
+    border: 2px solid #6c6d6d;
+    border-radius: 10px;
+    text-align: center;
+  }
+
+/* #guessField {
+    color: #000;
+    width: 250px;
+    height: 40px;
+    font-size: 30px;
+    border-style: none;
+    margin-top: 25px;
+    border: 5px solid #6c6d6d;
+    text-align: center;
+  }
+  
+  #guess {
+    font-size: 40px;
+    margin-top: 120px;
+    color: #fff;
+  }
+
+  #subt {
+    background-color: #161616;
+    color: #ffffff;
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+    font-size: 20px;
+    border-style: none;
+    margin-top: 50px;
+    
+  } */

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dynamic Cards Example</title>
+<style>
+  /* CSS for the card container */
+  .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px;
+    margin: 0 auto;
+    max-width: 1200px; /* Optional: to limit the maximum width */
+  }
+
+  /* CSS for the card */
+  .card {
+    flex: 1 1 300px; /* Flex property to make cards dynamic in size */
+    min-width: 300px; /* Minimum width for each card */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+
+  .card h2 {
+    margin-top: 0;
+  }
+
+  .card p {
+    margin-bottom: 0;
+  }
+
+  /* Media query for responsiveness */
+  @media screen and (max-width: 768px) {
+    .card {
+      flex-basis: calc(50% - 20px); /* Two cards per row on smaller screens */
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .card {
+      flex-basis: 100%; /* One card per row on smaller screens */
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="card-container">
+  <div class="card">
+    <h2>Card 1</h2>
+    <p>This is a dynamic card example.</p>
+  </div>
+  <div class="card">
+    <h2>Card 2</h2>
+    <p>This is another dynamic card example.</p>
+  </div>
+  <div class="card">
+    <h2>Card 3</h2>
+    <p>Yet another dynamic card example.</p>
+  </div>
+  <div class="card">
+    <h2>Card 4</h2>
+    <p>One more dynamic card example.</p>
+  </div>
+</div>
+
+</body>
+</html>
