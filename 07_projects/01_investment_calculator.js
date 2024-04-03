@@ -60,7 +60,7 @@ function addIncrementFieldForUserInput(numberOfDecade){
     for (let index = 0; index < numberOfDecade; index++) {
         const incrementField = document.createElement('input')
         incrementField.setAttribute('placeholder', `${index + 1} Inc`)
-        incrementField.setAttribute('type', 'text')
+        incrementField.setAttribute('type', 'number')
         incrementField.setAttribute('class', `inc-${index + 1}`)
         incrementField.style.cssText = `color: #000; width: 50px; height: 40px; 
                                         font-size: 30px; border style: none; 
