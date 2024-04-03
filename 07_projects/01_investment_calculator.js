@@ -5,19 +5,21 @@ const decadeWiseIncrementField = document.querySelector(".form-decade-wise-incre
 const insideIncrementCard = document.querySelector("#decade-wise-increment")
 const submitButton = document.querySelector('#subt')
 const decadeField = document.querySelector('#decadeField')
+const startNewButton = document.createElement('input')
 let allInc = []
 let play = true
 let incFieldCreation = false
+let globalDecades = 0
 
-if(play){
-    formServiceDecades.addEventListener('submit', function(e){
-        e.preventDefault()
+formServiceDecades.addEventListener('submit', function(e){
+    e.preventDefault()
+    if(play){
         const decades = parseInt(decadeField.value)
         if(validateNumber(decades)){
             addIncrementFieldForUserInput(decades)
             addDecadeIncSubmitButton()
             incFieldCreation = true
-            incFieldOperation(incFieldCreation, decades)
+            globalDecades = decades
             submitButton.setAttribute('disabled', '')
             decadeField.setAttribute('disabled', '')
         }
@@ -26,8 +28,31 @@ if(play){
             decadeField.setAttribute('disabled', '')
             addNewPlayButton()
         }  
-    })
-}
+    }
+})
+
+
+decadeWiseIncrementField.addEventListener('submit', function(e){
+    e.preventDefault()
+    if(incFieldCreation){
+        const decadeInValues = insideIncrementCard.querySelectorAll('input')
+        const decadeIncSubmitButton = insideIncrementCard.querySelector('.decadeIncSubmit')
+        for (let index = 0; index < globalDecades; index++) {
+            const incValue = parseInt(decadeInValues[index].value)
+            if (validateNumber(incValue)){
+                allInc.push(incValue)
+            }
+            else{
+                decadeIncSubmitButton.setAttribute('disabled', '')
+                addNewPlayButton()
+                break
+            }
+            
+        }
+        decadeIncSubmitButton.setAttribute('disabled', '')
+        console.log(allInc);
+    }
+})
 
 
 function addIncrementFieldForUserInput(numberOfDecade){
@@ -68,37 +93,15 @@ function validateNumber(num){
     }   
 }
 
-function incFieldOperation(incFieldFlag, decades){
-    decadeWiseIncrementField.addEventListener('submit', function(e){
-        e.preventDefault()
-        if(incFieldFlag){
-            const decadeInValues = insideIncrementCard.querySelectorAll('input')
-            const decadeIncSubmitButton = insideIncrementCard.querySelector('.decadeIncSubmit')
-            for (let index = 0; index < decades; index++) {
-                const incValue = parseInt(decadeInValues[index].value)
-                if (validateNumber(incValue)){
-                    allInc.push(incValue)
-                }
-                else{
-                    decadeIncSubmitButton.setAttribute('disabled', '')
-                    addNewPlayButton()
-                    break
-                }
-                
-            }
-            console.log(allInc);
-        }
-    })
-}
 
 function addNewPlayButton(){
-    const button = document.createElement('input')
-    button.setAttribute('type', `Submit`)
-    button.setAttribute('value', `Start New`)
-    button.setAttribute('id', `${submitButton.getAttribute('id')}`)
-    button.setAttribute('class', 'newTry')
-    button.style.cssText = "margin-left: 10px"
-    validationField.appendChild(button)
+    
+    startNewButton.setAttribute('type', `Submit`)
+    startNewButton.setAttribute('value', `Start New`)
+    startNewButton.setAttribute('id', `${submitButton.getAttribute('id')}`)
+    startNewButton.setAttribute('class', 'newTry')
+    startNewButton.style.cssText = "margin-left: 10px"
+    validationField.appendChild(startNewButton)
     endGame()
 }
 
@@ -113,12 +116,12 @@ function endGame(){
         decadeField.removeAttribute('disabled', '')
         if(incFieldCreation){
             const incInputField = insideIncrementCard.querySelectorAll('input')
-                incInputField.forEach(function(field){
-                    field.remove()
-                })
+            incInputField.forEach(function(field){
+                field.remove()
+            })
         }
         validationTextField.innerHTML = ''
-        validationField.removeChild(newGameButton)
+        newGameButton.remove()
 
     })
 }
