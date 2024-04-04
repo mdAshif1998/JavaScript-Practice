@@ -13,17 +13,27 @@
     <div class="card-container">
         <div class="card">
             <form class="form-service-decades">
-                <label2 for="decadeField" id="decadeInfo">Total Number of Decades</label>
-                <input type="number" id="decadeField" class="decadeField">
-                <input type="submit" id="subt" value="Submit" class="decadeInfoSubmit">
+                <nav>
+                    <a>
+                        <label2 for="decadeField" id="decadeInfo">Total Number of Decades</label>
+                    </a>
+                </nav>
+                <nav>
+                    <input type="number" id="decadeField" class="decadeField">
+                    <input type="submit" id="subt" value="Submit" class="decadeInfoSubmit">
+                </nav>
             </form>
         </div>
 
         <div class="card">
             <form class="form-decade-wise-increment">
-                <label2 for="incrementField" id="fillIncrement">
-                    Enter decade-wise increment (Percentage)
-                </label>
+                <nav>
+                    <a>
+                        <label2 for="incrementField" id="fillIncrement">
+                            Enter decade-wise increment (Percentage)
+                        </label>
+                    </a>
+                </nav>
                 <div id="decade-wise-increment">
 
                 </div>
@@ -32,12 +42,21 @@
 
         <div class="card">
             <form class="form-other-details">
-                <label2 for="otherDetailField" id="fillOtherDetail">
-                    Enter the other details
-                </label>
-                <input type="number" id="otherInputField" class="startingSalary" placeholder="Starting Salary">
-                <input type="number" id="otherInputField" class="investmentPer" placeholder="Percentage of Salary">
-
+                <nav>
+                    <a>
+                        <label2 for="otherDetailField" id="fillOtherDetail">
+                            Enter the other details
+                        </label>
+                    </a>
+                </nav>
+                <nav>
+                    <input type="submit" name="action" value="Collect" class="otherdetailsButton" id="collect">
+                    <input type="submit" name="action" value="Modify" class="otherdetailsButton" id="modify">
+                </nav>
+                <nav>
+                    <input type="number" id="otherInputField" class="startingSalary" placeholder="Starting Salary">
+                    <input type="number" id="otherInputField" class="investmentPer" placeholder="Percentage of Salary">
+                </nav>
             </form>
         </div>
 
@@ -49,18 +68,30 @@
                             Enter the portfolio details
                         </label>
                     </a>
-                    <input type="submit" value="Add" class="addItem">
                 </nav>
                 <nav>
-                    <input type="text" id="portfolioItemField" class="itemName" placeholder="Name">
-                    <input type="number" id="portfolioItemField" class="itemPercentage" placeholder="Percentage">
-                    <input type="number" id="portfolioItemField" class="expectedReturn" placeholder="Return">
+                    <input type="submit" name="action" value="Add" class="modifyPortfolioItem">
+                    <input type="submit" name="action" value="Remove" class="modifyPortfolioItem">
+                    <input type="submit" name="action" value="Collect" class="modifyPortfolioItem">
+                </nav>
+                <nav class="dynamicItem">
+                    
                 </nav>
             </form>
         </div>
         
         <div class="card" id="validation">
-            <p>Result: <span class="validation-result"></span></p>
+            <nav>
+                <a>
+                    <p>Result: <span class="validation-result"></span></p>
+                </a>
+            </nav>
+            <form class="form-result">
+                <nav>
+                    <input type="submit" name="action" value="Start New" class="ResultSectionButton" id="startNewButton" disabled>
+                    <input type="submit" name="action" value="Get Result" class="ResultSectionButton" id="getFinalResultButton">
+                </nav>
+            </form>
         </div>
 
         <div class="card" id="profit">
