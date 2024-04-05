@@ -88,8 +88,8 @@ otherDetailsForm.addEventListener('submit', function(e){
     if(action === "Collect"){
         collectButton.setAttribute('disabled', '')
         modifyButton.removeAttribute('disabled', '')
-        startingSalary = salaryField.value
-        percentageOfSalary = percentageField.value
+        startingSalary = parseFloat(salaryField.value)
+        percentageOfSalary = parseFloat(percentageField.value)
     }
     if(action === "Modify"){
         collectButton.removeAttribute('disabled', '')
@@ -128,8 +128,8 @@ portfolioItemAddButton.addEventListener('submit', function(e){
         portfolioItemInfo.forEach(function(field){
             const portfolioItemInfoObj = {}
             portfolioItemInfoObj["itemName"] = field.querySelector('.itemName').value
-            portfolioItemInfoObj["itemPercentage"] = field.querySelector('.itemPercentage').value
-            portfolioItemInfoObj["expectedReturn"] = field.querySelector('.expectedReturn').value
+            portfolioItemInfoObj["itemPercentage"] = parseFloat(field.querySelector('.itemPercentage').value)
+            portfolioItemInfoObj["expectedReturn"] = parseFloat(field.querySelector('.expectedReturn').value)
             portfolioItemInfoObj["id"] = field.getAttribute('class').split('-')[1]
             portfolioObj.push(portfolioItemInfoObj)
         })
@@ -166,10 +166,16 @@ resultSectionForm.addEventListener('submit', function(e){
     }
     else if(action === "Get Result"){
         // Need to do the final calculation to get the ultimate profit
-        console.log("User Input For Cool Profit");
-        console.log(`Increment List: ${allInc}`);
-        console.log(`Starting Salary: ${startingSalary}`);
-        console.log(`Percentage of Salary: ${percentageOfSalary}`);
+        // console.log("User Input For Cool Profit");
+        // console.log(`Increment List: ${allInc}`);
+        // console.log(`Starting Salary: ${startingSalary}`);
+        // console.log(`Percentage of Salary: ${percentageOfSalary}`);
+        // console.log(portfolioObj);
+        
+        let allAttribute = getFinalProfit(allInc, portfolioObj, startingSalary, percentageOfSalary)
+        console.log(allAttribute["itemWiseGainList"]);
+        console.log(allAttribute["ultimateAmount"]);
+        console.log(allAttribute["validationStatus"]);
         endGameFlag = true
         startNewButton.removeAttribute('disabled', '')
 
@@ -220,3 +226,95 @@ function addNewPlayButton(){
     endGameFlag = true
 }
 
+function getInvestAmountYearlyBasis(itemPercentage, startingAmount,
+    salaryIncList, salaryPercent){
+    let amountArray = []
+    let tempStartingSalary = startingAmount
+    
+    for (let index = 0; index < salaryIncList.length; index++) {
+        const inc = salaryIncList[index]
+        
+        for (let index = 0; index < 10; index++) {
+            let investAmountInEachYear = 0
+            
+            if(index === 0){
+                const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
+                investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
+                // console.log(index, tempStartingSalary, investAmountInEachYear);
+            }
+            else{
+                tempStartingSalary = Math.round(tempStartingSalary + ((tempStartingSalary * inc) / 100), 3)
+
+                const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
+
+                investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
+                // console.log(index, tempStartingSalary, investAmountInEachYear);
+            }
+            amountArray.push(investAmountInEachYear)
+            
+        }
+        
+    }
+    return amountArray
+}
+
+function getExpectedItemReturn(itemPercentage, itemGrowth, startingAmount,
+    salaryIncList, salaryPercent){
+    let itemLevelInvestment = 0
+    let itemLevelGain = 0
+    let itemLevelTotal = 0
+    const yearlyBasisInvestment = getInvestAmountYearlyBasis(itemPercentage,
+        startingAmount, salaryIncList, salaryPercent)
+    // console.log(`yearlyBasisInvestment: ${yearlyBasisInvestment}`);
+    for (let index = 0; index < yearlyBasisInvestment.length; index++) {
+        const perYearInvestment = yearlyBasisInvestment[index]
+        itemLevelInvestment += perYearInvestment
+        itemLevelGain += Math.round((perYearInvestment * itemGrowth) / 100, 3)
+        itemLevelTotal += (itemLevelInvestment + itemLevelGain)
+        
+    }
+    return {
+        itemLevelInvestment: itemLevelInvestment,
+        itemLevelGain: itemLevelGain,
+        itemLevelTotal: itemLevelTotal
+    }
+    
+}
+
+function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, salaryPercentage){
+    let validationStatus = ""
+    let itemWiseGainList = []
+    let ultimateAmount = 0
+    if(incrementList.length === 0){
+        validationStatus = "Please Provide Decade-wise Increment"
+    }
+    else if(portfolioItemList.length === 0){
+        validationStatus = "Please Provide Portfolio Item"
+    }
+    else if(isNaN(myStartingSalary) || myStartingSalary === '' || myStartingSalary <= 0){
+        validationStatus = "Please Provide Starting Salary"
+    }
+    else if(isNaN(salaryPercentage) || salaryPercentage === '' || salaryPercentage <= 0){
+        validationStatus = "Please Provide Percentage of Starting Salary"
+    }
+    else{
+        for (let index = 0; index < portfolioItemList.length; index++) {
+            const eachItemInPortfolio = portfolioItemList[index]
+            const itemWiseAttributeObj = getExpectedItemReturn(eachItemInPortfolio["itemPercentage"], eachItemInPortfolio["expectedReturn"], myStartingSalary, incrementList, salaryPercentage)
+            eachItemInPortfolio["itemLevelInvestment"] = itemWiseAttributeObj["itemLevelInvestment"]
+            eachItemInPortfolio["itemLevelGain"] = itemWiseAttributeObj["itemLevelGain"]
+            eachItemInPortfolio["itemLevelTotal"] = itemWiseAttributeObj["itemLevelTotal"]
+            itemWiseGainList.push(eachItemInPortfolio)
+
+        }
+        const ultimateAmount = Math.round(itemWiseGainList.reduce( function (acc, current) {return acc + current["itemLevelTotal"]}, 0), 2)
+        validationStatus = "Calculation Done"
+
+    }
+    
+    return {
+        validationStatus: validationStatus,
+        itemWiseGainList: itemWiseGainList,
+        ultimateAmount: ultimateAmount
+    }
+}
