@@ -16,7 +16,10 @@ const resultSectionForm = document.querySelector(".form-result")
 const validationTextField = document.querySelector('.validation-result')
 const startNewButton = document.querySelector('#startNewButton')
 
+const finalProfitSection = document.querySelector('#profit')
+
 let decadeIncNav = document.createElement('nav')
+let disabledButtonStyle = `opacity: 0.6; cursor: not-allowed`
 
 // User input
 let allInc = []
@@ -44,12 +47,17 @@ formServiceDecades.addEventListener('submit', function(e){
             insideIncrementCard.appendChild(decadeIncNav)
             incFieldCreation = true
             globalDecades = decades
-            submitButton.setAttribute('disabled', '')
-            decadeField.setAttribute('disabled', '')
+            // submitButton.setAttribute('disabled', '')
+            disabledOneButton(submitButton)
+            // decadeField.setAttribute('disabled', '')
+            disabledOneButton(decadeField)
         }
         else{
-            submitButton.setAttribute('disabled', '')
-            decadeField.setAttribute('disabled', '')
+            showValidationResult(`Please give a valid number`)
+            // submitButton.setAttribute('disabled', '')
+            disabledOneButton(submitButton)
+            // decadeField.setAttribute('disabled', '')
+            disabledOneButton(decadeField)
             addNewPlayButton()
         }  
     }
@@ -67,12 +75,15 @@ decadeWiseIncrementField.addEventListener('submit', function(e){
                 allInc.push(incValue)
             }
             else{
-                decadeIncSubmitButton.setAttribute('disabled', '')
+                // decadeIncSubmitButton.setAttribute('disabled', '')
+                showValidationResult(`Please give a valid number`)
+                disabledOneButton(decadeIncSubmitButton)
                 addNewPlayButton()
                 break
             }
         }
-        decadeIncSubmitButton.setAttribute('disabled', '')
+        disabledOneButton(decadeIncSubmitButton)
+        // decadeIncSubmitButton.setAttribute('disabled', '')
     }
 })
 
@@ -86,14 +97,18 @@ otherDetailsForm.addEventListener('submit', function(e){
     // Get user's button click response
     let action = e.submitter.value
     if(action === "Collect"){
-        collectButton.setAttribute('disabled', '')
-        modifyButton.removeAttribute('disabled', '')
+        // collectButton.setAttribute('disabled', '')
+        disabledOneButton(collectButton)
+        // modifyButton.removeAttribute('disabled', '')
+        enableOneButton(modifyButton)
         startingSalary = parseFloat(salaryField.value)
         percentageOfSalary = parseFloat(percentageField.value)
     }
     if(action === "Modify"){
-        collectButton.removeAttribute('disabled', '')
-        modifyButton.setAttribute('disabled', '')
+        // collectButton.removeAttribute('disabled', '')
+        enableOneButton(collectButton)
+        // modifyButton.setAttribute('disabled', '')
+        disabledOneButton(modifyButton)
     }
 })
 
@@ -143,42 +158,10 @@ resultSectionForm.addEventListener('submit', function(e){
     // Get the value of the clicked button
     let action = e.submitter.value
     if(endGameFlag && action === "Start New"){
-        play = true
-        allInc = []
-        startingSalary = 0
-        percentageOfSalary = 0
-        globalDecades = 0
-        portfolioObj = []
-        decadeField.value = ''
-        salaryField.value = ''
-        percentageField.value = ''
-        submitButton.removeAttribute('disabled', '')
-        decadeField.removeAttribute('disabled', '')
-        if(incFieldCreation){
-            const incInputField = insideIncrementCard.querySelector('.incElement')
-            if(incInputField){
-                insideIncrementCard.removeChild(decadeIncNav)
-            }
-        }
-        decadeIncNav = document.createElement('nav')
-        validationTextField.innerHTML = ''
-        startNewButton.setAttribute('disabled', '')
+        startNewActions()
     }
     else if(action === "Get Result"){
-        // Need to do the final calculation to get the ultimate profit
-        // console.log("User Input For Cool Profit");
-        // console.log(`Increment List: ${allInc}`);
-        // console.log(`Starting Salary: ${startingSalary}`);
-        // console.log(`Percentage of Salary: ${percentageOfSalary}`);
-        // console.log(portfolioObj);
-        
-        let allAttribute = getFinalProfit(allInc, portfolioObj, startingSalary, percentageOfSalary)
-        console.log(allAttribute["itemWiseGainList"]);
-        console.log(allAttribute["ultimateAmount"]);
-        console.log(allAttribute["validationStatus"]);
-        endGameFlag = true
-        startNewButton.removeAttribute('disabled', '')
-
+        getResultActions()
     }
 })
 
@@ -211,9 +194,84 @@ function addDecadeIncSubmitButton(){
 
 }
 
+function removeExistingPortfolioItem(){
+    const existingElementsOfPortfolio = dynamicPortfolioItem.querySelectorAll("#elementsOfPortfolio")
+    if(existingElementsOfPortfolio){
+        existingElementsOfPortfolio.forEach(function(e){
+            dynamicPortfolioItem.removeChild(e)
+        })
+    }
+}
+
+function removeExistingFinalProfitContent(){
+    const anyPreviousProfit = finalProfitSection.querySelector(".profit-section")
+    if(anyPreviousProfit){
+        finalProfitSection.removeChild(anyPreviousProfit)
+    }
+}
+
+function populateFinalProfitSection(totalAmountInvested, totalGain, finalAmount){
+    removeExistingFinalProfitContent()
+    const finalProfitElements = document.createElement('nav')
+    finalProfitElements.setAttribute('class', `profit-section`)
+    
+    finalProfitElements.innerHTML = `<a>
+    <p>Amount Invested: <span class="totalAmountInvested">INR: ${totalAmountInvested}</span></p>
+    <p>Total Gain: <span class="totalAmountInvested">INR: ${totalGain}</span></p>
+    <p>Final Amount: <span class="totalAmountInvested">INR: ${finalAmount}</span></p>
+    </a>
+    `
+    finalProfitSection.appendChild(finalProfitElements)
+}
+
+function startNewActions(){
+    play = true
+    allInc = []
+    startingSalary = 0
+    percentageOfSalary = 0
+    globalDecades = 0
+    portfolioObj = []
+    decadeField.value = ''
+    salaryField.value = ''
+    percentageField.value = ''
+    
+    enableOneButton(submitButton)
+    enableOneButton(decadeField)
+    if(incFieldCreation){
+        const incInputField = insideIncrementCard.querySelector('.incElement')
+        if(incInputField){
+            insideIncrementCard.removeChild(decadeIncNav)
+        }
+    }
+    decadeIncNav = document.createElement('nav')
+    validationTextField.innerHTML = ''
+    removeExistingFinalProfitContent()
+    removeExistingPortfolioItem()
+    disabledOneButton(startNewButton)
+}
+
+function getResultActions(){
+    validationTextField.innerHTML = ''
+    let allAttribute = getFinalProfit(allInc, portfolioObj, startingSalary, percentageOfSalary)
+    if(allAttribute["validationStatus"] !== "Calculation Done"){
+        showValidationResult(allAttribute["validationStatus"])
+    }
+    else{
+        const itemWiseInfoList = allAttribute["itemWiseGainList"]
+        const finalTotalAmount = Math.round(itemWiseInfoList.reduce( function (acc, current) {return acc + current["itemLevelTotal"]}, 0), 2)
+        
+        const amountInvested = Math.round(itemWiseInfoList.reduce( function (acc, current) {return acc + current["itemLevelInvestment"]}, 0), 2)
+
+        const totalGain = Math.round(itemWiseInfoList.reduce( function (acc, current) {return acc + current["itemLevelGain"]}, 0), 2)
+        console.log(amountInvested, totalGain, finalTotalAmount);
+        populateFinalProfitSection(amountInvested, totalGain, finalTotalAmount)
+    }
+    endGameFlag = true
+    enableOneButton(startNewButton)
+}
+
 function validateNumber(num){
     if(isNaN(num) || num === ''){
-        validationTextField.innerHTML = `Please give a valid number`
         return false
     }
     else{
@@ -222,8 +280,22 @@ function validateNumber(num){
 }
 
 function addNewPlayButton(){
-    startNewButton.removeAttribute('disabled', '')
+    enableOneButton(startNewButton)
     endGameFlag = true
+}
+
+function disabledOneButton(element){
+    element.setAttribute('disabled', '')
+    element.setAttribute('style', disabledButtonStyle)
+}
+
+function enableOneButton(element){
+    element.removeAttribute('disabled', '')
+    element.removeAttribute('style', disabledButtonStyle)
+}
+
+function showValidationResult(resultStatus){
+    validationTextField.innerHTML = resultStatus
 }
 
 function getInvestAmountYearlyBasis(itemPercentage, startingAmount,
@@ -240,7 +312,7 @@ function getInvestAmountYearlyBasis(itemPercentage, startingAmount,
             if(index === 0){
                 const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
                 investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
-                // console.log(index, tempStartingSalary, investAmountInEachYear);
+                
             }
             else{
                 tempStartingSalary = Math.round(tempStartingSalary + ((tempStartingSalary * inc) / 100), 3)
@@ -248,7 +320,7 @@ function getInvestAmountYearlyBasis(itemPercentage, startingAmount,
                 const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
 
                 investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
-                // console.log(index, tempStartingSalary, investAmountInEachYear);
+                
             }
             amountArray.push(investAmountInEachYear)
             
@@ -263,16 +335,17 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, startingAmount,
     let itemLevelInvestment = 0
     let itemLevelGain = 0
     let itemLevelTotal = 0
+    let incrementalTotalInvest = 0
     const yearlyBasisInvestment = getInvestAmountYearlyBasis(itemPercentage,
         startingAmount, salaryIncList, salaryPercent)
-    // console.log(`yearlyBasisInvestment: ${yearlyBasisInvestment}`);
     for (let index = 0; index < yearlyBasisInvestment.length; index++) {
         const perYearInvestment = yearlyBasisInvestment[index]
         itemLevelInvestment += perYearInvestment
-        itemLevelGain += Math.round((perYearInvestment * itemGrowth) / 100, 3)
-        itemLevelTotal += (itemLevelInvestment + itemLevelGain)
-        
+        incrementalTotalInvest += (perYearInvestment + itemLevelGain)
+        itemLevelGain += Math.round((incrementalTotalInvest * itemGrowth) / 100, 3)
     }
+    itemLevelTotal = (itemLevelInvestment + itemLevelGain)
+    
     return {
         itemLevelInvestment: itemLevelInvestment,
         itemLevelGain: itemLevelGain,
@@ -284,7 +357,6 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, startingAmount,
 function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, salaryPercentage){
     let validationStatus = ""
     let itemWiseGainList = []
-    let ultimateAmount = 0
     if(incrementList.length === 0){
         validationStatus = "Please Provide Decade-wise Increment"
     }
@@ -307,14 +379,12 @@ function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, sala
             itemWiseGainList.push(eachItemInPortfolio)
 
         }
-        const ultimateAmount = Math.round(itemWiseGainList.reduce( function (acc, current) {return acc + current["itemLevelTotal"]}, 0), 2)
         validationStatus = "Calculation Done"
 
     }
     
     return {
         validationStatus: validationStatus,
-        itemWiseGainList: itemWiseGainList,
-        ultimateAmount: ultimateAmount
+        itemWiseGainList: itemWiseGainList
     }
 }
