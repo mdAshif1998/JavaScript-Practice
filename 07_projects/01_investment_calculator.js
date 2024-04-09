@@ -310,7 +310,9 @@ function getMfNav(expectedReturn, numberOfDecadeRange){
             templateArray[index] = element
         }
         else{
-            const element = templateArray[index - 1] * (1 + (expectedReturn/100 * 1/12))
+            
+            const mfNavValue = templateArray[index - 1] * (1 + (expectedReturn/100 * 1/12))
+            const element = Math.round(mfNavValue * 10) / 10
             templateArray[index] = element
         }
     }
@@ -325,12 +327,12 @@ function getYearlyInvestAmount(startingAmount, salaryIncList){
         for (let index = 0; index < 10; index++) {
             if(index === 0){
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
-                yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
+                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
             }
             else{
                 tempStartingSalary = Math.round(tempStartingSalary + ((tempStartingSalary * inc) / 100), 3)
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
-                yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
+                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
             }
         }
     }      
@@ -339,9 +341,9 @@ function getYearlyInvestAmount(startingAmount, salaryIncList){
 function getInvestAmountYearlyBasis(itemPercentage, salaryPercent){
     let amountArray = []
     for (let index = 0; index < yearlyInvestAmountArray.length; index++) {
-        const salaryInEachYear = salaryIncList[index]
+        const salaryInEachYear = yearlyInvestAmountArray[index]
         const itemWiseInvestmentPerItem = Math.round((salaryInEachYear * salaryPercent) / 100, 3)
-        investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
+        const investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100), 3)
         amountArray.push(investAmountInEachYear)
     }
     return amountArray
@@ -349,22 +351,36 @@ function getInvestAmountYearlyBasis(itemPercentage, salaryPercent){
 
 function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     let itemLevelInvestment = 0
-    let itemLevelGain = 0
-    let itemLevelTotal = 0
-    let incrementalTotalInvest = 0
-    const yearlyBasisInvestment = getInvestAmountYearlyBasis(itemPercentage, salaryPercent)
-    for (let index = 0; index < yearlyBasisInvestment.length; index++) {
-        const perYearInvestment = yearlyBasisInvestment[index]
-        itemLevelInvestment += perYearInvestment
-        incrementalTotalInvest += (perYearInvestment + itemLevelGain)
-        itemLevelGain += Math.round((incrementalTotalInvest * itemGrowth) / 100, 3)
+    const allMonthlyInvestment = getInvestAmountYearlyBasis(itemPercentage, salaryPercent)
+    console.log(allMonthlyInvestment);
+    const allMfNav = getMfNav(itemGrowth, globalDecades)
+    let unitsArray = []
+    let cumUnitsArray = []
+    let momentValueArray = []
+    const firstCumUnits = allMonthlyInvestment[0]/allMfNav[0]
+    for (let index = 0; index < allMonthlyInvestment.length; index++) {
+        if(index === 0){
+            const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 10) / 10
+            unitsArray.push(units)
+            cumUnitsArray.push(firstCumUnits)
+            const momentValue = firstCumUnits * allMfNav[index]
+            momentValueArray.push(momentValue)
+        }
+        else{
+            const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 10) / 10
+            unitsArray.push(units)
+            const cumUnits = cumUnitsArray[index - 1] + units
+            cumUnitsArray.push(cumUnits)
+            const momentValue = cumUnits * allMfNav[index]
+            momentValueArray.push(momentValue)
+        }
+        itemLevelInvestment += allMonthlyInvestment[index]
     }
-    itemLevelTotal = (itemLevelInvestment + itemLevelGain)
     
     return {
         itemLevelInvestment: itemLevelInvestment,
-        itemLevelGain: itemLevelGain,
-        itemLevelTotal: itemLevelTotal
+        itemLevelGain: momentValueArray[momentValueArray.length - 1] - itemLevelInvestment,
+        itemLevelTotal: momentValueArray[momentValueArray.length - 1]
     }
     
 }
@@ -390,7 +406,7 @@ function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, sala
         // Get Portfolio item wise calculations
         for (let index = 0; index < portfolioItemList.length; index++) {
             const eachItemInPortfolio = portfolioItemList[index]
-            const itemWiseAttributeObj = getExpectedItemReturn(eachItemInPortfolio["itemPercentage"], eachItemInPortfolio["expectedReturn"], myStartingSalary, incrementList, salaryPercentage)
+            const itemWiseAttributeObj = getExpectedItemReturn(eachItemInPortfolio["itemPercentage"], eachItemInPortfolio["expectedReturn"], salaryPercentage)
             eachItemInPortfolio["itemLevelInvestment"] = itemWiseAttributeObj["itemLevelInvestment"]
             eachItemInPortfolio["itemLevelGain"] = itemWiseAttributeObj["itemLevelGain"]
             eachItemInPortfolio["itemLevelTotal"] = itemWiseAttributeObj["itemLevelTotal"]
