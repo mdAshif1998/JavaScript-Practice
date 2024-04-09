@@ -141,6 +141,7 @@ portfolioItemAddButton.addEventListener('submit', function(e){
     }
     else if(action === "Collect" && itemIndex > 1){
         const portfolioItemInfo = dynamicPortfolioItem.querySelectorAll(`#elementsOfPortfolio`)
+        portfolioObj = []
         portfolioItemInfo.forEach(function(field){
             const portfolioItemInfoObj = {}
             portfolioItemInfoObj["itemName"] = field.querySelector('.itemName').value
@@ -265,7 +266,8 @@ function getResultActions(){
         const amountInvested = Math.round(itemWiseInfoList.reduce( function (acc, current) {return acc + current["itemLevelInvestment"]}, 0), 2)
 
         const totalGain = Math.round(itemWiseInfoList.reduce( function (acc, current) {return acc + current["itemLevelGain"]}, 0), 2)
-        console.log(amountInvested, totalGain, finalTotalAmount);
+        // console.log(amountInvested, totalGain, finalTotalAmount);
+        yearlyInvestAmountArray = []
         populateFinalProfitSection(amountInvested, totalGain, finalTotalAmount)
     }
     endGameFlag = true
@@ -312,7 +314,8 @@ function getMfNav(expectedReturn, numberOfDecadeRange){
         else{
             
             const mfNavValue = templateArray[index - 1] * (1 + (expectedReturn/100 * 1/12))
-            const element = Math.round(mfNavValue * 10) / 10
+            // const element = Math.round(mfNavValue * 100000) / 100000
+            const element = mfNavValue
             templateArray[index] = element
         }
     }
@@ -322,37 +325,39 @@ function getMfNav(expectedReturn, numberOfDecadeRange){
 // Populate invested amount in every month for the time period
 function getYearlyInvestAmount(startingAmount, salaryIncList){
     let tempStartingSalary = startingAmount
+    
     for (let index = 0; index < salaryIncList.length; index++) {
         const inc = salaryIncList[index]
-        for (let index = 0; index < 10; index++) {
-            if(index === 0){
+        for (let innerIndex = 0; innerIndex < 10; innerIndex++) {
+            if(yearlyInvestAmountArray.length === 0){
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
-                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
+                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)
             }
             else{
-                tempStartingSalary = Math.round(tempStartingSalary + ((tempStartingSalary * inc) / 100), 3)
+                tempStartingSalary = tempStartingSalary + (tempStartingSalary * inc) / 100
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
-                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
+                yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)
             }
         }
     }      
 }
 
-function getInvestAmountYearlyBasis(itemPercentage, salaryPercent){
+function getInvestAmountMonthlyBasis(itemPercentage, salaryPercent){
     let amountArray = []
     for (let index = 0; index < yearlyInvestAmountArray.length; index++) {
         const salaryInEachYear = yearlyInvestAmountArray[index]
-        const itemWiseInvestmentPerItem = Math.round((salaryInEachYear * salaryPercent) / 100, 3)
-        const investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100), 3)
-        amountArray.push(investAmountInEachYear)
+        const itemWiseInvestmentPerItem = (salaryInEachYear * salaryPercent) / 100
+        // const investAmountInEachMonth = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 100000) / 100000
+        
+        const investAmountInEachMonth = (itemPercentage * itemWiseInvestmentPerItem) / 100
+        amountArray.push(investAmountInEachMonth)
     }
     return amountArray
 }
 
 function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     let itemLevelInvestment = 0
-    const allMonthlyInvestment = getInvestAmountYearlyBasis(itemPercentage, salaryPercent)
-    console.log(allMonthlyInvestment);
+    const allMonthlyInvestment = getInvestAmountMonthlyBasis(itemPercentage, salaryPercent)
     const allMfNav = getMfNav(itemGrowth, globalDecades)
     let unitsArray = []
     let cumUnitsArray = []
@@ -360,14 +365,16 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     const firstCumUnits = allMonthlyInvestment[0]/allMfNav[0]
     for (let index = 0; index < allMonthlyInvestment.length; index++) {
         if(index === 0){
-            const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 10) / 10
+            // const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 1000) / 1000
+            const units = allMonthlyInvestment[index] / allMfNav[index]
             unitsArray.push(units)
             cumUnitsArray.push(firstCumUnits)
             const momentValue = firstCumUnits * allMfNav[index]
             momentValueArray.push(momentValue)
         }
         else{
-            const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 10) / 10
+            // const units = Math.round(allMonthlyInvestment[index] / allMfNav[index] * 1000) / 1000
+            const units = allMonthlyInvestment[index] / allMfNav[index]
             unitsArray.push(units)
             const cumUnits = cumUnitsArray[index - 1] + units
             cumUnitsArray.push(cumUnits)
