@@ -1,8 +1,4 @@
 console.log("Hello World")
-let itemObjArray = [{
-    itemLevelTotal: 45768
-}]
-
-const ultimateAmount = Math.round(itemObjArray.reduce( function (acc, current) {return acc + current["itemLevelTotal"]}, 0), 2)
-
-console.log(ultimateAmount);
+const salary1 = new Array(2).fill(20000)
+const salary2 = new Array(2).fill(40000)
+console.log(salary1.concat(salary2));

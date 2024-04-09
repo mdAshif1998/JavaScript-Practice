@@ -20,6 +20,7 @@ const finalProfitSection = document.querySelector('#profit')
 
 let decadeIncNav = document.createElement('nav')
 let disabledButtonStyle = `opacity: 0.6; cursor: not-allowed`
+let yearlyInvestAmountArray = []
 
 // User input
 let allInc = []
@@ -231,6 +232,7 @@ function startNewActions(){
     percentageOfSalary = 0
     globalDecades = 0
     portfolioObj = []
+    yearlyInvestAmountArray = []
     decadeField.value = ''
     salaryField.value = ''
     percentageField.value = ''
@@ -298,46 +300,59 @@ function showValidationResult(resultStatus){
     validationTextField.innerHTML = resultStatus
 }
 
-function getInvestAmountYearlyBasis(itemPercentage, startingAmount,
-    salaryIncList, salaryPercent){
-    let amountArray = []
+// Get expected return in every month for the time period
+function getMfNav(expectedReturn, numberOfDecadeRange){
+    const templateArray = new Array(numberOfDecadeRange * 10 * 12)
+    const startingExpectedReturn = 10
+    for (let index = 0; index < templateArray.length; index++) {
+        if(index === 0){
+            const element = startingExpectedReturn
+            templateArray[index] = element
+        }
+        else{
+            const element = templateArray[index - 1] * (1 + (expectedReturn/100 * 1/12))
+            templateArray[index] = element
+        }
+    }
+    return templateArray
+}
+
+// Populate invested amount in every month for the time period
+function getYearlyInvestAmount(startingAmount, salaryIncList){
     let tempStartingSalary = startingAmount
-    
     for (let index = 0; index < salaryIncList.length; index++) {
         const inc = salaryIncList[index]
-        
         for (let index = 0; index < 10; index++) {
-            let investAmountInEachYear = 0
-            
             if(index === 0){
-                const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
-                investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
-                
+                const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
+                yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
             }
             else{
                 tempStartingSalary = Math.round(tempStartingSalary + ((tempStartingSalary * inc) / 100), 3)
-
-                const itemWiseInvestmentPerItem = Math.round((tempStartingSalary * salaryPercent) / 100, 3)
-
-                investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
-                
+                const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
+                yearlyInvestAmountArray.concat(salaryArrayForMonthly)   
             }
-            amountArray.push(investAmountInEachYear)
-            
         }
-        
+    }      
+}
+
+function getInvestAmountYearlyBasis(itemPercentage, salaryPercent){
+    let amountArray = []
+    for (let index = 0; index < yearlyInvestAmountArray.length; index++) {
+        const salaryInEachYear = salaryIncList[index]
+        const itemWiseInvestmentPerItem = Math.round((salaryInEachYear * salaryPercent) / 100, 3)
+        investAmountInEachYear = Math.round(((itemPercentage * itemWiseInvestmentPerItem) / 100) * 12, 3)
+        amountArray.push(investAmountInEachYear)
     }
     return amountArray
 }
 
-function getExpectedItemReturn(itemPercentage, itemGrowth, startingAmount,
-    salaryIncList, salaryPercent){
+function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     let itemLevelInvestment = 0
     let itemLevelGain = 0
     let itemLevelTotal = 0
     let incrementalTotalInvest = 0
-    const yearlyBasisInvestment = getInvestAmountYearlyBasis(itemPercentage,
-        startingAmount, salaryIncList, salaryPercent)
+    const yearlyBasisInvestment = getInvestAmountYearlyBasis(itemPercentage, salaryPercent)
     for (let index = 0; index < yearlyBasisInvestment.length; index++) {
         const perYearInvestment = yearlyBasisInvestment[index]
         itemLevelInvestment += perYearInvestment
@@ -370,6 +385,9 @@ function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, sala
         validationStatus = "Please Provide Percentage of Starting Salary"
     }
     else{
+        // Accumulate yearly investment amount
+        getYearlyInvestAmount(myStartingSalary, incrementList)
+        // Get Portfolio item wise calculations
         for (let index = 0; index < portfolioItemList.length; index++) {
             const eachItemInPortfolio = portfolioItemList[index]
             const itemWiseAttributeObj = getExpectedItemReturn(eachItemInPortfolio["itemPercentage"], eachItemInPortfolio["expectedReturn"], myStartingSalary, incrementList, salaryPercentage)
