@@ -108,7 +108,7 @@ nav a[aria-current='page'] {
     color: whitesmoke;
   }
 
-  .modifyPortfolioItem {
+  .modifyDynamicItem {
     background-color: #161616;
     color: #ffffff;
     min-width: 6.2rem;
@@ -119,7 +119,7 @@ nav a[aria-current='page'] {
     cursor: pointer;
   }
 
-  .modifyPortfolioItem:hover {
+  .modifyDynamicItem:hover {
     background-color: yellowgreen;
     color: black;
   }
@@ -180,7 +180,7 @@ nav a[aria-current='page'] {
     text-align: center;
   }
 
-  #portfolioItemField {
+  #dynamicItemUserInput {
     color: #000;
     width: 6.2rem;
     height: 25px;

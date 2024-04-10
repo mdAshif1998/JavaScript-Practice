@@ -12,31 +12,40 @@
     </div>
     <div class="card-container">
         <div class="card">
-            <form class="form-service-decades">
+            <form class="form-salary-wise-investment">
                 <nav>
                     <a>
-                        <label2 for="decadeField" id="decadeInfo">Total Number of Decades</label>
+                        <label2 for="salaryWiseInvestment" id="salaryWiseInvestmentInfo">Salary Wise Investment Plan</label>
                     </a>
                 </nav>
                 <nav>
-                    <input type="number" id="decadeField" class="decadeField">
-                    <input type="submit" id="subt" value="Submit" class="decadeInfoSubmit">
+                    <input type="submit" name="action" value="Add" class="modifyDynamicItem">
+                    <input type="submit" name="action" value="Remove" class="modifyDynamicItem">
+                    <input type="submit" name="action" value="Collect" class="modifyDynamicItem">
+                </nav>
+                <nav class="dynamicSalaryIncVsTime">
+                    
                 </nav>
             </form>
         </div>
 
         <div class="card">
-            <form class="form-decade-wise-increment">
+            <form class="form-normal-investment-with-step-up">
                 <nav>
                     <a>
                         <label2 for="incrementField" id="fillIncrement">
-                            Enter decade-wise increment (Percentage)
+                            Normal Investment Plan
                         </label>
                     </a>
                 </nav>
-                <div id="decade-wise-increment">
-
-                </div>
+                <nav>
+                    <input type="submit" name="action" value="Collect" class="otherdetailsButton" id="inc-collect">
+                    <input type="submit" name="action" value="Modify" class="otherdetailsButton" id="inc-modify">
+                </nav>
+                <nav>
+                    <input type="number" id="otherInputField" class="timePeriod" placeholder="Duration">
+                    <input type="number" id="otherInputField" class="stepUp" placeholder="Step Up">
+                </nav>
             </form>
         </div>
 
@@ -70,9 +79,9 @@
                     </a>
                 </nav>
                 <nav>
-                    <input type="submit" name="action" value="Add" class="modifyPortfolioItem">
-                    <input type="submit" name="action" value="Remove" class="modifyPortfolioItem">
-                    <input type="submit" name="action" value="Collect" class="modifyPortfolioItem">
+                    <input type="submit" name="action" value="Add" class="modifyDynamicItem">
+                    <input type="submit" name="action" value="Remove" class="modifyDynamicItem">
+                    <input type="submit" name="action" value="Collect" class="modifyDynamicItem">
                 </nav>
                 <nav class="dynamicItem">
                     
@@ -88,7 +97,7 @@
             </nav>
             <form class="form-result">
                 <nav>
-                    <input type="submit" name="action" value="Start New" class="ResultSectionButton" id="startNewButton" disabled>
+                    <input type="submit" name="action" value="Start New" class="ResultSectionButton" id="startNewButton">
                     <input type="submit" name="action" value="Get Result" class="ResultSectionButton" id="getFinalResultButton">
                 </nav>
             </form>

@@ -1,8 +1,11 @@
-const formServiceDecades = document.querySelector(".form-service-decades")
-const submitButton = document.querySelector('#subt')
-const decadeField = document.querySelector('#decadeField')
+const formSalaryWiseInvest = document.querySelector(".form-salary-wise-investment")
+const dynamicSalaryIncVsTime = document.querySelector('.dynamicSalaryIncVsTime')
 
-const decadeWiseIncrementField = document.querySelector(".form-decade-wise-increment")
+const normalInvestmentField = document.querySelector(".form-normal-investment-with-step-up")
+const durationInput = normalInvestmentField.querySelector(".timePeriod")
+const stepUpInput = normalInvestmentField.querySelector(".stepUp")
+const normalInvestCollectButton = normalInvestmentField.querySelector('#inc-collect')
+const normalInvestModifyButton = normalInvestmentField.querySelector('#inc-modify')
 const insideIncrementCard = document.querySelector("#decade-wise-increment")
 
 const otherDetailsForm = document.querySelector('.form-other-details')
@@ -18,7 +21,6 @@ const startNewButton = document.querySelector('#startNewButton')
 
 const finalProfitSection = document.querySelector('#profit')
 
-let decadeIncNav = document.createElement('nav')
 let disabledButtonStyle = `opacity: 0.6; cursor: not-allowed`
 let yearlyInvestAmountArray = []
 
@@ -28,63 +30,84 @@ let globalDecades = 0
 let startingSalary = 0
 let percentageOfSalary = 0
 let portfolioObj = []
+let timePeriodVsIncrementObjectList = []
 
 // Variable definition
 let itemIndex = 1
+let formSalaryWiseInvestItemIndex = 1
 let play = true
-let incFieldCreation = false
 let endGameFlag = false
 
 
-// Listen the user's decade response
-formServiceDecades.addEventListener('submit', function(e){
+// Listen the user's salary-wise investment plan
+formSalaryWiseInvest.addEventListener('submit', function(e){
     e.preventDefault()
     if(play){
-        const decades = parseInt(decadeField.value)
-        if(validateNumber(decades)){
-            decadeIncNav.setAttribute('class', 'incElement')
-            addIncrementFieldForUserInput(decades)
-            addDecadeIncSubmitButton()
-            insideIncrementCard.appendChild(decadeIncNav)
-            incFieldCreation = true
-            globalDecades = decades
-            // submitButton.setAttribute('disabled', '')
-            disabledOneButton(submitButton)
-            // decadeField.setAttribute('disabled', '')
-            disabledOneButton(decadeField)
+        // Get user's button click response
+        let action = e.submitter.value
+        if(action === "Add"){
+            // Disable Normal Investment Buttons
+            disabledOneButton(normalInvestCollectButton)
+            disabledOneButton(normalInvestModifyButton)
+            // Create new portfolio element <p> tag
+            const newItem = document.createElement('p')
+            newItem.setAttribute('class', `salaryItemNo-${formSalaryWiseInvestItemIndex}`)
+            newItem.setAttribute('id', `elementsOfSalaryWiseInvest`)
+            newItem.innerHTML = `<input type="text" id="dynamicItemUserInput" class="salaryDuration" placeholder="Salary Duration">
+            <input type="number" id="dynamicItemUserInput" class="salaryIncrement" placeholder="Increment (%)">
+            `
+            dynamicSalaryIncVsTime.appendChild(newItem)
+            formSalaryWiseInvestItemIndex = formSalaryWiseInvestItemIndex + 1
         }
-        else{
-            showValidationResult(`Please give a valid number`)
-            // submitButton.setAttribute('disabled', '')
-            disabledOneButton(submitButton)
-            // decadeField.setAttribute('disabled', '')
-            disabledOneButton(decadeField)
-            addNewPlayButton()
-        }  
+
+        else if(action === "Remove" && formSalaryWiseInvestItemIndex > 1){
+            let removableItem = document.querySelector(`.salaryItemNo-${formSalaryWiseInvestItemIndex - 1}`)
+            if(removableItem){
+                dynamicSalaryIncVsTime.removeChild(removableItem)
+                formSalaryWiseInvestItemIndex = formSalaryWiseInvestItemIndex - 1
+                if(timePeriodVsIncrementObjectList.length > 0){
+                    timePeriodVsIncrementObjectList.pop()
+                }
+            }
+        }
+
+        else if(action === "Collect" && formSalaryWiseInvestItemIndex > 1){
+            const salaryItemInfo = dynamicSalaryIncVsTime.querySelectorAll(`#elementsOfSalaryWiseInvest`)
+            timePeriodVsIncrementObjectList = []
+            salaryItemInfo.forEach(function(field){
+                const salaryItemObject = {
+                    incrementValue: parseFloat(field.querySelector('.salaryIncrement').value),
+                    timeRange: parseFloat(field.querySelector('.salaryDuration').value),
+                    id: field.getAttribute('class').split('-')[1]
+
+                }
+                timePeriodVsIncrementObjectList.push(salaryItemObject)
+            })
+        }
     }
 })
 
-// Listen the user's decade-wise increment response
-decadeWiseIncrementField.addEventListener('submit', function(e){
+// Listen the user's normal investment plan
+normalInvestmentField.addEventListener('submit', function(e){
     e.preventDefault()
-    if(incFieldCreation){
-        const decadeInValues = decadeIncNav.querySelectorAll('#incItem')
-        const decadeIncSubmitButton = decadeIncNav.querySelector('.decadeIncSubmit')
-        for (let index = 0; index < globalDecades; index++) {
-            const incValue = parseInt(decadeInValues[index].value)
-            if (validateNumber(incValue)){
-                allInc.push(incValue)
-            }
-            else{
-                // decadeIncSubmitButton.setAttribute('disabled', '')
-                showValidationResult(`Please give a valid number`)
-                disabledOneButton(decadeIncSubmitButton)
-                addNewPlayButton()
-                break
-            }
+    // Get user's button click response
+    let action = e.submitter.value
+    timePeriodVsIncrementObjectList = []
+    if(action === "Collect"){
+        disabledOneButton(normalInvestCollectButton)
+        // modifyButton.removeAttribute('disabled', '')
+        enableOneButton(normalInvestModifyButton)
+        const normalInvestObj = {
+            incrementValue: parseFloat(stepUpInput.value),
+            timeRange: parseFloat(durationInput.value)
         }
-        disabledOneButton(decadeIncSubmitButton)
-        // decadeIncSubmitButton.setAttribute('disabled', '')
+        timePeriodVsIncrementObjectList.push(normalInvestObj)
+    }
+    else if(action === "Modify"){
+        // collectButton.removeAttribute('disabled', '')
+        enableOneButton(normalInvestCollectButton)
+        // modifyButton.setAttribute('disabled', '')
+        disabledOneButton(normalInvestModifyButton)
     }
 })
 
@@ -105,7 +128,7 @@ otherDetailsForm.addEventListener('submit', function(e){
         startingSalary = parseFloat(salaryField.value)
         percentageOfSalary = parseFloat(percentageField.value)
     }
-    if(action === "Modify"){
+    else if(action === "Modify"){
         // collectButton.removeAttribute('disabled', '')
         enableOneButton(collectButton)
         // modifyButton.setAttribute('disabled', '')
@@ -123,9 +146,9 @@ portfolioItemAddButton.addEventListener('submit', function(e){
         const newPortfolioItem = document.createElement('p')
         newPortfolioItem.setAttribute('class', `itemNo-${itemIndex}`)
         newPortfolioItem.setAttribute('id', `elementsOfPortfolio`)
-        newPortfolioItem.innerHTML = `<input type="text" id="portfolioItemField" class="itemName" placeholder="Name">
-        <input type="number" id="portfolioItemField" class="itemPercentage" placeholder="Percentage">
-        <input type="number" id="portfolioItemField" class="expectedReturn" placeholder="Return">`
+        newPortfolioItem.innerHTML = `<input type="text" id="dynamicItemUserInput" class="itemName" placeholder="Name">
+        <input type="number" id="dynamicItemUserInput" class="itemPercentage" placeholder="Percentage">
+        <input type="number" id="dynamicItemUserInput" class="expectedReturn" placeholder="Return">`
         dynamicPortfolioItem.appendChild(newPortfolioItem)
         itemIndex = itemIndex + 1
     }
@@ -159,7 +182,7 @@ resultSectionForm.addEventListener('submit', function(e){
     e.preventDefault()
     // Get the value of the clicked button
     let action = e.submitter.value
-    if(endGameFlag && action === "Start New"){
+    if(endGameFlag || action === "Start New"){
         startNewActions()
     }
     else if(action === "Get Result"){
@@ -167,40 +190,20 @@ resultSectionForm.addEventListener('submit', function(e){
     }
 })
 
-function addIncrementFieldForUserInput(numberOfDecade){
-    
-    for (let index = 0; index < numberOfDecade; index++) {
-        const incrementField = document.createElement('input')
-        incrementField.setAttribute('placeholder', `${index + 1} Inc`)
-        incrementField.setAttribute('type', 'number')
-        incrementField.setAttribute('id', 'incItem')
-        incrementField.setAttribute('class', `inc-${index + 1}`)
-        incrementField.style.cssText = `color: #000; width: 50px; height: 37px; 
-                                        font-size: 30px; border style: none; 
-                                        margin-top: 10px; border: 2px solid #6c6d6d; 
-                                        border-radius: 10px; text-align: center; font-size: 10px; margin-left: 10px`
-        decadeIncNav.appendChild(incrementField)
-
-    }
-    
-}
-
-function addDecadeIncSubmitButton(){
-    const button = document.createElement('input')
-    button.setAttribute('type', `Submit`)
-    button.setAttribute('value', `Submit`)
-    button.setAttribute('id', `${submitButton.getAttribute('id')}`)
-    button.setAttribute('class', 'decadeIncSubmit')
-    button.style.cssText = "margin-left: 10px"
-    decadeIncNav.appendChild(button)
-
-}
-
 function removeExistingPortfolioItem(){
     const existingElementsOfPortfolio = dynamicPortfolioItem.querySelectorAll("#elementsOfPortfolio")
     if(existingElementsOfPortfolio){
         existingElementsOfPortfolio.forEach(function(e){
             dynamicPortfolioItem.removeChild(e)
+        })
+    }
+}
+
+function removeExistingSalaryIncItem(){
+    const existingElementsOfSalaryIncrement = dynamicSalaryIncVsTime.querySelectorAll("#elementsOfSalaryWiseInvest")
+    if(existingElementsOfSalaryIncrement){
+        existingElementsOfSalaryIncrement.forEach(function(e){
+            dynamicSalaryIncVsTime.removeChild(e)
         })
     }
 }
@@ -227,6 +230,7 @@ function populateFinalProfitSection(totalAmountInvested, totalGain, finalAmount)
 }
 
 function startNewActions(){
+    
     play = true
     allInc = []
     startingSalary = 0
@@ -234,28 +238,24 @@ function startNewActions(){
     globalDecades = 0
     portfolioObj = []
     yearlyInvestAmountArray = []
-    decadeField.value = ''
+    timePeriodVsIncrementObjectList = []
     salaryField.value = ''
     percentageField.value = ''
+    durationInput.value = ''
+    stepUpInput.value = ''
     
-    enableOneButton(submitButton)
-    enableOneButton(decadeField)
-    if(incFieldCreation){
-        const incInputField = insideIncrementCard.querySelector('.incElement')
-        if(incInputField){
-            insideIncrementCard.removeChild(decadeIncNav)
-        }
-    }
-    decadeIncNav = document.createElement('nav')
     validationTextField.innerHTML = ''
     removeExistingFinalProfitContent()
+    removeExistingSalaryIncItem()
     removeExistingPortfolioItem()
-    disabledOneButton(startNewButton)
+    // disabledOneButton(startNewButton)
+    enableOneButton(normalInvestCollectButton)
+    enableOneButton(normalInvestModifyButton)
 }
 
 function getResultActions(){
     validationTextField.innerHTML = ''
-    let allAttribute = getFinalProfit(allInc, portfolioObj, startingSalary, percentageOfSalary)
+    let allAttribute = getFinalProfit(portfolioObj, startingSalary, percentageOfSalary, timePeriodVsIncrementObjectList)
     if(allAttribute["validationStatus"] !== "Calculation Done"){
         showValidationResult(allAttribute["validationStatus"])
     }
@@ -323,12 +323,13 @@ function getMfNav(expectedReturn, numberOfDecadeRange){
 }
 
 // Populate invested amount in every month for the time period
-function getYearlyInvestAmount(startingAmount, salaryIncList){
+function getYearlyInvestAmount(startingAmount, incVsTimeRange){
     let tempStartingSalary = startingAmount
     
-    for (let index = 0; index < salaryIncList.length; index++) {
-        const inc = salaryIncList[index]
-        for (let innerIndex = 0; innerIndex < 10; innerIndex++) {
+    for (let index = 0; index < incVsTimeRange.length; index++) {
+        const inc = incVsTimeRange[index]["incrementValue"]
+        const timePeriod = arrayOfTimePeriod[index]["timeRange"]
+        for (let innerIndex = 0; innerIndex < timePeriod; innerIndex++) {
             if(yearlyInvestAmountArray.length === 0){
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
                 yearlyInvestAmountArray = yearlyInvestAmountArray.concat(salaryArrayForMonthly)
@@ -392,11 +393,11 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     
 }
 
-function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, salaryPercentage){
+function getFinalProfit(portfolioItemList, myStartingSalary, salaryPercentage, incVsTimeRange){
     let validationStatus = ""
     let itemWiseGainList = []
-    if(incrementList.length === 0){
-        validationStatus = "Please Provide Decade-wise Increment"
+    if(incVsTimeRange.length === 0){
+        validationStatus = "Please provide Step Up along with time period"
     }
     else if(portfolioItemList.length === 0){
         validationStatus = "Please Provide Portfolio Item"
@@ -409,7 +410,7 @@ function getFinalProfit(incrementList, portfolioItemList, myStartingSalary, sala
     }
     else{
         // Accumulate yearly investment amount
-        getYearlyInvestAmount(myStartingSalary, incrementList)
+        getYearlyInvestAmount(myStartingSalary, incVsTimeRange)
         // Get Portfolio item wise calculations
         for (let index = 0; index < portfolioItemList.length; index++) {
             const eachItemInPortfolio = portfolioItemList[index]
