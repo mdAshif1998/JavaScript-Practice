@@ -182,7 +182,7 @@ resultSectionForm.addEventListener('submit', function(e){
     e.preventDefault()
     // Get the value of the clicked button
     let action = e.submitter.value
-    if(endGameFlag || action === "Start New"){
+    if(endGameFlag && action === "Start New"){
         startNewActions()
     }
     else if(action === "Get Result"){
@@ -254,8 +254,10 @@ function startNewActions(){
 }
 
 function getResultActions(){
+    
     validationTextField.innerHTML = ''
     let allAttribute = getFinalProfit(portfolioObj, startingSalary, percentageOfSalary, timePeriodVsIncrementObjectList)
+    
     if(allAttribute["validationStatus"] !== "Calculation Done"){
         showValidationResult(allAttribute["validationStatus"])
     }
@@ -274,20 +276,6 @@ function getResultActions(){
     enableOneButton(startNewButton)
 }
 
-function validateNumber(num){
-    if(isNaN(num) || num === ''){
-        return false
-    }
-    else{
-        return true
-    }   
-}
-
-function addNewPlayButton(){
-    enableOneButton(startNewButton)
-    endGameFlag = true
-}
-
 function disabledOneButton(element){
     element.setAttribute('disabled', '')
     element.setAttribute('style', disabledButtonStyle)
@@ -303,7 +291,8 @@ function showValidationResult(resultStatus){
 }
 
 // Get expected return in every month for the time period
-function getMfNav(expectedReturn, numberOfDecadeRange){
+function getMfNav(expectedReturn){
+    const numberOfDecadeRange = timePeriodVsIncrementObjectList.reduce(function(accumulated, current){return accumulated + current["timeRange"]}, 0)
     const templateArray = new Array(numberOfDecadeRange * 10 * 12)
     const startingExpectedReturn = 10
     for (let index = 0; index < templateArray.length; index++) {
@@ -325,10 +314,10 @@ function getMfNav(expectedReturn, numberOfDecadeRange){
 // Populate invested amount in every month for the time period
 function getYearlyInvestAmount(startingAmount, incVsTimeRange){
     let tempStartingSalary = startingAmount
-    
+    console.log(incVsTimeRange);
     for (let index = 0; index < incVsTimeRange.length; index++) {
         const inc = incVsTimeRange[index]["incrementValue"]
-        const timePeriod = arrayOfTimePeriod[index]["timeRange"]
+        const timePeriod = incVsTimeRange[index]["timeRange"]
         for (let innerIndex = 0; innerIndex < timePeriod; innerIndex++) {
             if(yearlyInvestAmountArray.length === 0){
                 const salaryArrayForMonthly = new Array(12).fill(tempStartingSalary)
@@ -359,7 +348,7 @@ function getInvestAmountMonthlyBasis(itemPercentage, salaryPercent){
 function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
     let itemLevelInvestment = 0
     const allMonthlyInvestment = getInvestAmountMonthlyBasis(itemPercentage, salaryPercent)
-    const allMfNav = getMfNav(itemGrowth, globalDecades)
+    const allMfNav = getMfNav(itemGrowth)
     let unitsArray = []
     let cumUnitsArray = []
     let momentValueArray = []
@@ -384,7 +373,6 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
         }
         itemLevelInvestment += allMonthlyInvestment[index]
     }
-    
     return {
         itemLevelInvestment: itemLevelInvestment,
         itemLevelGain: momentValueArray[momentValueArray.length - 1] - itemLevelInvestment,
@@ -396,7 +384,7 @@ function getExpectedItemReturn(itemPercentage, itemGrowth, salaryPercent){
 function getFinalProfit(portfolioItemList, myStartingSalary, salaryPercentage, incVsTimeRange){
     let validationStatus = ""
     let itemWiseGainList = []
-    if(incVsTimeRange.length === 0){
+    if(timePeriodVsIncrementObjectList.length === 0){
         validationStatus = "Please provide Step Up along with time period"
     }
     else if(portfolioItemList.length === 0){
@@ -408,9 +396,10 @@ function getFinalProfit(portfolioItemList, myStartingSalary, salaryPercentage, i
     else if(isNaN(salaryPercentage) || salaryPercentage === '' || salaryPercentage <= 0){
         validationStatus = "Please Provide Percentage of Starting Salary"
     }
+    
     else{
         // Accumulate yearly investment amount
-        getYearlyInvestAmount(myStartingSalary, incVsTimeRange)
+        getYearlyInvestAmount(myStartingSalary, timePeriodVsIncrementObjectList)
         // Get Portfolio item wise calculations
         for (let index = 0; index < portfolioItemList.length; index++) {
             const eachItemInPortfolio = portfolioItemList[index]
