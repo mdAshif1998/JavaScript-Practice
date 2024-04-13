@@ -21,7 +21,13 @@
         console.log(str, Date.now());
     }
     const intervalId = setInterval(sayDate, 1000, "Hello")
+    document.querySelector('#start').addEventListener(function(){
+        setInterval(sayDate, 1000, "Hello")
+    })
+    document.querySelector('#stop').addEventListener(function(){
+        clearInterval(intervalId)
+    })
 
-    clearInterval(intervalId)
+    
 </script>
 </html>
